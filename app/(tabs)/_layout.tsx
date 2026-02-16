@@ -1,57 +1,90 @@
 import React from 'react';
+import { Tabs } from 'expo-router';
+import { View, StyleSheet, Platform, TouchableOpacity } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
+import { styled } from 'nativewind';
+import * as Haptics from 'expo-haptics';
+import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated';
 
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+const StyledView = styled(View);
 
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
+  focused: boolean;
 }) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+  return (
+    <StyledView className="items-center justify-center pt-2">
+      <FontAwesome size={20} style={{ marginBottom: -3 }} {...props} />
+      {props.focused && (
+        <Animated.View
+          className="w-1.5 h-1.5 rounded-full bg-[#89986D] mt-2"
+          style={{ shadowColor: '#89986D', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 4 }}
+        />
+      )}
+    </StyledView>
+  );
 }
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
-      }}>
+        tabBarActiveTintColor: '#89986D',
+        tabBarInactiveTintColor: '#C5D89D',
+        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: '#FFFFFF',
+          borderTopWidth: 0,
+          height: Platform.OS === 'ios' ? 95 : 75,
+          paddingBottom: Platform.OS === 'ios' ? 35 : 15,
+          paddingTop: 10,
+          borderTopLeftRadius: 50,
+          borderTopRightRadius: 50,
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          shadowColor: '#2D3321',
+          shadowOffset: { width: 0, height: -20 },
+          shadowOpacity: 0.04,
+          shadowRadius: 40,
+          elevation: 10,
+        },
+        tabBarLabelStyle: {
+          fontSize: 9,
+          fontFamily: 'System',
+          fontWeight: '900',
+          textTransform: 'uppercase',
+          letterSpacing: 2,
+          marginTop: 6,
+        },
+      }}
+      screenListeners={{
+        tabPress: () => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
+          title: 'Book Now',
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name="calendar-o" color={color} focused={focused} />,
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="bookings"
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Archive',
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name="archive" color={color} focused={focused} />,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Control',
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name="sliders" color={color} focused={focused} />,
         }}
       />
     </Tabs>
