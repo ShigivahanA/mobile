@@ -13,13 +13,16 @@ const LOCAL_IP = "192.168.1.46";
 const debuggerHost = Constants.expoConfig?.hostUri || Constants.manifest?.debuggerHost;
 const host = debuggerHost?.split(':')[0]; // This is usually the LAN IP (e.g. 192.168.1.46)
 
+// Production Vercel URL
+const PRODUCTION_URL = "https://bookbackend-sepia.vercel.app";
+
 // Priority: 
-// 1. Host detected by Expo (most reliable for dev)
-// 2. Hardcoded detected IP (fallback)
-// 3. Localhost (last resort)
-const BASE_URL = host && host !== 'localhost' && host !== '127.0.0.1'
-    ? `http://${host}:5000`
-    : `http://${LOCAL_IP}:5000`;
+// 1. Production URL (if not in __DEV__)
+// 2. Host detected by Expo (for local dev)
+// 3. Fallback LAN IP
+const BASE_URL = __DEV__
+    ? (host && host !== 'localhost' && host !== '127.0.0.1' ? `http://${host}:5000` : `http://${LOCAL_IP}:5000`)
+    : PRODUCTION_URL;
 
 console.log('API Base URL:', BASE_URL);
 
